@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ExUa Direct Link Extractor
 // @namespace    http://github.com/ndikanov/
-// @version      0.2
+// @version      0.2.1
 // @description  Direct link extractor for ex.ua
 // @author       Nick
 // @grant        none
@@ -14,69 +14,77 @@ function main() {
 
     var sourceElements = document.getElementsByClassName('mail-add');
 
+    
+
     for(var i=0; i<sourceElements.length; i++){
 
-        var md5 = sourceElements[i].parentNode.previousSibling.children[1].innerHTML;
-        var fileNameElement = sourceElements[i].parentNode.parentNode.previousElementSibling.previousElementSibling.getElementsByTagName('a')[0];
-        var fileName = fileNameElement.getAttribute('title');
-        fileName = encodeURI(fileName);
+        var playColumnChildrenQty = sourceElements[i].parentNode.parentNode.previousElementSibling.childNodes.length;
+        console.log(playColumnChildrenQty);
 
-        var fsElements = sourceElements[i].parentNode.nextSibling.children;
+        if (playColumnChildrenQty > 1) {
 
-        var span = document.createElement('span');
-        span.setAttribute('class', 'r_button_small');
-        span.style.float = 'right';
+            var md5 = sourceElements[i].parentNode.previousElementSibling.children[1].innerHTML;
+            var fileNameElement = sourceElements[i].parentNode.parentNode.previousElementSibling.previousElementSibling.getElementsByTagName('a')[0];
+            var fileName = fileNameElement.getAttribute('title');
+            fileName = encodeURI(fileName);
 
-        var parent = fileNameElement.parentNode;
-        parent.insertBefore(span, fileNameElement.nextSibling);
+            var fsElements = sourceElements[i].parentNode.nextSibling.children;
 
-        for(var j=0; j<fsElements.length; j++){
-            var fsElement = fsElements[j];
-            
-            var fsName = fsElement.innerHTML;
-            var fileId = fsElement.getAttribute('href').match(/\d+/);
+            var span = document.createElement('span');
+            span.setAttribute('class', 'r_button_small');
+            span.style.float = 'right';
 
-            var directLink = 'http://'+fsName+'.www.ex.ua/show/'+md5+'/'+fileId+'/'+fileName;
+            var parent = fileNameElement.parentNode;
+            parent.insertBefore(span, fileNameElement.nextSibling);
 
-            var directLinkInput = document.createElement('input');
-            directLinkInput.setAttribute('value', directLink);
+            for(var j=0; j<fsElements.length; j++){
+                var fsElement = fsElements[j];
+                
+                var fsName = fsElement.innerHTML;
+                var fileId = fsElement.getAttribute('href').match(/\d+/);
 
-            // ===TextArea Hiding Begin===
-            // Place in top-left corner of screen regardless of scroll position.
-            directLinkInput.style.position = 'fixed';
-            directLinkInput.style.top = 0;
-            directLinkInput.style.left = 0;
+                var directLink = 'http://'+fsName+'.www.ex.ua/show/'+md5+'/'+fileId+'/'+fileName;
 
-            // Ensure it has a small width and height. Setting to 1px / 1em
-            // doesn't work as this gives a negative w/h on some browsers.
-            directLinkInput.style.width = '2em';
-            directLinkInput.style.height = '2em';
+                var directLinkInput = document.createElement('input');
+                directLinkInput.setAttribute('value', directLink);
 
-            // We don't need padding, reducing the size if it does flash render.
-            directLinkInput.style.padding = 0;
+                // ===TextArea Hiding Begin===
+                // Place in top-left corner of screen regardless of scroll position.
+                directLinkInput.style.position = 'fixed';
+                directLinkInput.style.top = 0;
+                directLinkInput.style.left = 0;
 
-            // Clean up any borders.
-            directLinkInput.style.border = 'none';
-            directLinkInput.style.outline = 'none';
-            directLinkInput.style.boxShadow = 'none';
+                // Ensure it has a small width and height. Setting to 1px / 1em
+                // doesn't work as this gives a negative w/h on some browsers.
+                directLinkInput.style.width = '2em';
+                directLinkInput.style.height = '2em';
 
-            // Avoid flash of white box if rendered for any reason.
-            directLinkInput.style.background = 'transparent';
-            // ===TextArea Hiding End===
+                // We don't need padding, reducing the size if it does flash render.
+                directLinkInput.style.padding = 0;
 
-            var directLinkButton = document.createElement('a');
-            directLinkButton.innerHTML = 'копировать '+fsName;
-            directLinkButton.setAttribute('href','');
-            directLinkButton.setAttribute('onclick','return false');
-            directLinkButton.addEventListener("click", copyDirectLink);
+                // Clean up any borders.
+                directLinkInput.style.border = 'none';
+                directLinkInput.style.outline = 'none';
+                directLinkInput.style.boxShadow = 'none';
 
-            span.appendChild(directLinkInput);
-            span.appendChild(directLinkButton);
-            
-            function copyDirectLink(){
-                var currentInput = this.previousElementSibling;
-                currentInput.select();
-                document.execCommand('copy');
+                // Avoid flash of white box if rendered for any reason.
+                directLinkInput.style.background = 'transparent';
+                // ===TextArea Hiding End===
+
+                var directLinkButton = document.createElement('a');
+                directLinkButton.innerHTML = 'копировать '+fsName;
+                directLinkButton.setAttribute('href','');
+                directLinkButton.setAttribute('onclick','return false');
+                directLinkButton.addEventListener("click", copyDirectLink);
+
+                span.appendChild(directLinkInput);
+                span.appendChild(directLinkButton);
+                
+                function copyDirectLink(){
+                    var currentInput = this.previousElementSibling;
+                    currentInput.select();
+                    document.execCommand('copy');
+                }
             }
         }
     }
