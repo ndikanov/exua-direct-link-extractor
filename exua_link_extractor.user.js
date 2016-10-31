@@ -1,4 +1,5 @@
     // ==UserScript==
+    // @icon         http://www.ex.ua/favicon.ico    
     // @name         ExUa Direct Link Extractor
     // @namespace    http://github.com/ndikanov/
     // @version      0.3
